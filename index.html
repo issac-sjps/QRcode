@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定義文字 QR Code 產生器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; }
+        #canvas-container { display: flex; justify-content: center; margin-top: 20px; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">QR Code 標題產生器</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">網址 (URL)</label>
+                <input type="text" id="url-input" placeholder="https://example.com" 
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">標題文字</label>
+                <input type="text" id="title-input" placeholder="輸入你想顯示的文字" 
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">文字位置</label>
+                <select id="text-position" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                    <option value="top">標題在上方</option>
+                    <option value="bottom">標題在下方</option>
+                    <option value="middle">標題在中間 (建議簡短)</option>
+                </select>
+            </div>
+
+            <button onclick="generateQR()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200">
+                產生 QR Code
+            </button>
+        </div>
+
+        <div id="qrcode-raw" style="display:none"></div>
+
+        <div id="canvas-container">
+            <canvas id="final-canvas" class="border shadow-sm bg-white"></canvas>
+        </div>
+
+        <div class="mt-4 text-center">
+            <button id="download-btn" onclick="downloadQR()" class="text-sm text-indigo-600 hover:underline hidden">
+                下載圖片
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function generateQR() {
+            const url = document.getElementById('url-input').value;
+            const title = document.getElementById('title-input').value;
+            const position = document.getElementById('text-position').value;
+            const rawContainer = document.getElementById('qrcode-raw');
+            
+            if (!url) {
+                alert("請輸入網址！");
+                return;
+            }
+
+            // 1. 清除舊內容
+            rawContainer.innerHTML = "";
+            const canvas = document.getElementById('final-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 2. 產生 QR Code (使用糾錯等級 H，中間有字才不會失效)
+            const qrcode = new QRCode(rawContainer, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // 3. 等待圖片生成後繪製到 Canvas
+            setTimeout(() => {
+                const qrImg = rawContainer.querySelector('img');
+                
+                // 設定 Canvas 大小
+                const padding = 40;
+                const qrSize = 256;
+                canvas.width = qrSize + padding;
+                
+                if (position === 'top' || position === 'bottom') {
+                    canvas.height = qrSize + padding + 40; // 為文字預留空間
+                } else {
+                    canvas.height = qrSize + padding;
+                }
+
+                // 填滿背景白色
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 設定文字樣式
+                ctx.fillStyle = "#000000";
+                ctx.font = "bold 20px Arial";
+                ctx.textAlign = "center";
+
+                if (position === 'top') {
+                    ctx.fillText(title, canvas.width / 2, 35);
+                    ctx.drawImage(qrImg, padding/2, 50, qrSize, qrSize);
+                } else if (position === 'bottom') {
+                    ctx.drawImage(qrImg, padding/2, 20, qrSize, qrSize);
+                    ctx.fillText(title, canvas.width / 2, canvas.height - 15);
+                } else if (position === 'middle') {
+                    ctx.drawImage(qrImg, padding/2, padding/2, qrSize, qrSize);
+                    
+                    // 繪製中間文字背景(白色小方塊)
+                    const textWidth = ctx.measureText(title).width + 10;
+                    ctx.fillStyle = "white";
+                    ctx.fillRect((canvas.width - textWidth) / 2, (canvas.height - 30) / 2, textWidth, 30);
+                    
+                    // 繪製中間文字
+                    ctx.fillStyle = "black";
+                    ctx.font = "bold 16px Arial";
+                    ctx.fillText(title, canvas.width / 2, (canvas.height / 2) + 6);
+                }
+
+                document.getElementById('download-btn').classList.remove('hidden');
+            }, 100);
+        }
+
+        function downloadQR() {
+            const canvas = document.getElementById('final-canvas');
+            const link = document.createElement('a');
+            link.download = 'qrcode-with-title.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
