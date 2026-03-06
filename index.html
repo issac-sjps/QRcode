@@ -3,233 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新莊國小 QRcode 專業排版產生器</title>
+    <title>新莊國小 QRcode 特色造型產生器</title>
     <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; }
-        input[type="color"] {
-            -webkit-appearance: none; border: none; width: 100%; height: 40px;
-            padding: 0; border-radius: 8px; cursor: pointer; overflow: hidden;
-        }
-        input[type="range"] { cursor: pointer; }
-        /* 讓預覽區域可以捲動，避免畫布太大擋住介面 */
-        #preview-scroll-area {
-            max-height: 500px;
-            overflow: auto;
-            border: 2px dashed #cbd5e1;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px;
+        input[type="color"] { -webkit-appearance: none; border: none; width: 100%; height: 35px; cursor: pointer; border-radius: 5px; }
+        input[type="range"] { cursor: pointer; accent-color: #2563eb; }
+        #preview-scroll-area { 
+            max-height: 550px; overflow: auto; border: 2px dashed #cbd5e1; 
+            background-color: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px;
         }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
+<body class="bg-slate-50 min-h-screen p-4">
 
     <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-6">
         
-        <div class="w-full lg:w-96 space-y-4 bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
-             <div class="border-b pb-2">
-                <h1 class="text-xl font-black text-blue-900">新莊國小 QRcode</h1>
-                <p class="text-xs text-slate-500 font-bold">進階排版模式</p>
+        <div class="w-full lg:w-96 space-y-4 bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
+             <div class="border-b pb-2 flex justify-between items-center">
+                <h1 class="text-xl font-black text-blue-900">新莊國小 QR 產生器</h1>
+                <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">V5.0 元素造型版</span>
              </div>
             
-            <div class="space-y-3">
-                <label class="block text-sm font-bold text-gray-700">1. 內容設定</label>
+            <div class="space-y-2">
                 <div class="flex gap-2">
-                    <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="auto-update flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="shortenURL()" id="short-btn" class="px-2 py-1 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 transition">縮址</button>
+                    <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="auto-update flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="shortenURL()" id="short-btn" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700">縮址</button>
                 </div>
-                <input type="text" id="title-input" value="新莊國小" class="auto-update w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="title-input" value="新莊國小" class="auto-update w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none">
             </div>
 
-            <div class="space-y-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
-                <label class="block text-xs font-black text-blue-800 uppercase">標題文字排版</label>
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-600">字體大小</span>
+            <div class="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 space-y-3">
+                <label class="block text-xs font-black text-blue-800 uppercase">✨ 特色造型外框</label>
+                <select id="frame-theme" class="auto-update w-full px-2 py-2 border rounded-lg text-xs font-bold bg-white">
+                    <option value="none">無外框 (預設)</option>
+                    <option value="water">💧 水元素 (水滴感)</option>
+                    <option value="fire">🔥 火元素 (太陽感)</option>
+                    <option value="heart">❤️ 愛心造型 (溫馨感)</option>
+                    <option value="leaf">🍃 綠葉造型 (自然感)</option>
+                </select>
+                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                    <span>框線粗細</span>
+                    <input type="range" id="frame-width" min="1" max="15" value="5" class="auto-update w-2/3">
+                </div>
+            </div>
+
+            <div class="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex items-center justify-between text-xs font-bold">
+                    <span>字體大小</span>
                     <div class="flex items-center gap-1">
-                        <button onclick="adjustValue('title-size', -2)" class="w-8 h-8 bg-white border border-slate-300 rounded shadow-sm hover:bg-gray-100 font-bold">-</button>
-                        <input type="number" id="title-size" value="28" class="auto-update w-12 text-center bg-transparent font-bold">
-                        <button onclick="adjustValue('title-size', 2)" class="w-8 h-8 bg-white border border-slate-300 rounded shadow-sm hover:bg-gray-100 font-bold">+</button>
+                        <button onclick="adjustValue('title-size', -2)" class="w-6 h-6 bg-white border rounded font-bold">-</button>
+                        <input type="number" id="title-size" value="28" class="auto-update w-10 text-center bg-transparent font-bold">
+                        <button onclick="adjustValue('title-size', 2)" class="w-6 h-6 bg-white border rounded font-bold">+</button>
                     </div>
                 </div>
-                <div>
-                    <div class="flex justify-between mb-1 text-xs font-bold text-slate-600">
-                        <span>文字與 QR 距離</span>
-                        <span id="title-margin-val">10</span>
-                    </div>
-                    <input type="range" id="title-margin" min="0" max="100" value="10" class="auto-update w-full accent-blue-600">
-                </div>
-            </div>
-
-            <div class="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                <label class="block font-black text-slate-700 uppercase">畫布邊框 (Padding)</label>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-                    <div>
-                        <span class="text-slate-500">上邊距</span>
-                        <input type="range" id="pad-top" min="0" max="100" value="30" class="auto-update w-full">
-                    </div>
-                    <div>
-                        <span class="text-slate-500">下邊距</span>
-                        <input type="range" id="pad-bottom" min="0" max="100" value="30" class="auto-update w-full">
-                    </div>
-                    <div>
-                        <span class="text-slate-500">左邊距</span>
-                        <input type="range" id="pad-left" min="0" max="100" value="30" class="auto-update w-full">
-                    </div>
-                    <div>
-                        <span class="text-slate-500">右邊距</span>
-                        <input type="range" id="pad-right" min="0" max="100" value="30" class="auto-update w-full">
-                    </div>
+                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-slate-500">
+                    <div>上留白 <input type="range" id="pad-top" min="0" max="150" value="40" class="auto-update w-full"></div>
+                    <div>下留白 <input type="range" id="pad-bottom" min="0" max="150" value="40" class="auto-update w-full"></div>
+                    <div>左留白 <input type="range" id="pad-left" min="0" max="150" value="40" class="auto-update w-full"></div>
+                    <div>右留白 <input type="range" id="pad-right" min="0" max="150" value="40" class="auto-update w-full"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2">
                 <select id="shape-style" class="auto-update px-2 py-2 border rounded-lg text-xs font-bold">
-                    <option value="square">標準方形</option>
-                    <option value="rounded">圓角方塊</option>
-                    <option value="dots">圓點風格</option>
+                    <option value="square">方形點</option>
+                    <option value="rounded">圓角點</option>
+                    <option value="dots">圓點點</option>
                 </select>
                 <select id="text-position" class="auto-update px-2 py-2 border rounded-lg text-xs font-bold">
-                    <option value="top">標題在上方</option>
-                    <option value="bottom" selected>標題在下方</option>
-                    <option value="middle">標題在中間</option>
+                    <option value="top">文字在上</option>
+                    <option value="bottom" selected>文字在下</option>
                 </select>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <input type="color" id="fg-color" value="#000000" class="auto-update">
                     <span class="text-[10px] font-bold">QR色</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <input type="color" id="text-color" value="#000000" class="auto-update">
-                    <span class="text-[10px] font-bold">文字色</span>
+                    <span class="text-[10px] font-bold">文字/框色</span>
                 </div>
             </div>
 
-            <button onclick="downloadQR()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-lg shadow-lg hover:bg-blue-700 active:scale-95 transition-all">
-                下載這張圖片
+            <button onclick="downloadQR()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-lg shadow-lg hover:shadow-blue-200 active:scale-95 transition-all">
+                📥 下載專屬 QR Code
             </button>
         </div>
 
         <div class="flex-1 flex flex-col">
-            <div class="mb-2 flex justify-between items-end">
-                <span class="text-sm font-bold text-slate-500">實時預覽 (與下載結果完全一致)</span>
-                <span id="canvas-dim" class="text-xs bg-slate-200 px-2 py-1 rounded font-mono">0 x 0 px</span>
-            </div>
-            <div id="preview-scroll-area" class="flex-1 flex items-center justify-center p-10 rounded-2xl">
+            <div id="preview-scroll-area" class="flex-1 flex items-center justify-center p-12 rounded-3xl">
                 <div class="bg-white shadow-2xl">
                     <canvas id="final-canvas"></canvas>
                 </div>
             </div>
+            <p class="mt-2 text-center text-xs text-slate-400">※ 提示：增加「留白」可以讓外框造型更明顯</p>
         </div>
     </div>
 
     <script>
-        // 初始化 QR Code Styling (固定 300px)
         const QR_SIZE = 300;
         let qrCodeStyling = new QRCodeStyling({
             width: QR_SIZE, height: QR_SIZE, type: "canvas",
             qrOptions: { errorCorrectionLevel: 'H' }
         });
 
-        function adjustValue(id, amount) {
-            const input = document.getElementById(id);
-            input.value = parseInt(input.value) + amount;
-            generateQR();
-        }
-
+        function adjustValue(id, val) { document.getElementById(id).value = parseInt(document.getElementById(id).value) + val; generateQR(); }
+        
         document.querySelectorAll('.auto-update').forEach(el => {
-            el.addEventListener('input', () => {
-                if(el.id === 'title-margin') document.getElementById('title-margin-val').innerText = el.value;
-                generateQR();
-            });
+            el.addEventListener('input', generateQR);
+            el.addEventListener('change', generateQR);
         });
-
-        window.onload = () => { generateQR(); }
 
         async function shortenURL() {
             const urlInput = document.getElementById('url-input');
             const btn = document.getElementById('short-btn');
             try {
                 btn.innerText = "...";
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlInput.value)}`);
-                if (response.ok) { urlInput.value = await response.text(); generateQR(); }
+                const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlInput.value)}`);
+                if (res.ok) { urlInput.value = await res.text(); generateQR(); }
             } finally { btn.innerText = "縮址"; }
         }
+
+        window.onload = () => { generateQR(); }
 
         async function generateQR() {
             const url = document.getElementById('url-input').value || " ";
             const title = document.getElementById('title-input').value;
+            const theme = document.getElementById('frame-theme').value;
             const position = document.getElementById('text-position').value;
-            const shapeStyle = document.getElementById('shape-style').value;
-            const fgColor = document.getElementById('fg-color').value;
-            const textColor = document.getElementById('text-color').value;
-            
-            // 排版數據
+            const fWidth = parseInt(document.getElementById('frame-width').value);
             const titleSize = parseInt(document.getElementById('title-size').value);
-            const titleMargin = parseInt(document.getElementById('title-margin').value);
             const pTop = parseInt(document.getElementById('pad-top').value);
             const pBottom = parseInt(document.getElementById('pad-bottom').value);
             const pLeft = parseInt(document.getElementById('pad-left').value);
             const pRight = parseInt(document.getElementById('pad-right').value);
+            const fgColor = document.getElementById('fg-color').value;
+            const textColor = document.getElementById('text-color').value;
 
             const finalCanvas = document.getElementById('final-canvas');
             const ctx = finalCanvas.getContext('2d');
 
-            // 1. 更新 QR Code
-            let dt = 'square', cs = 'square', cd = 'square';
-            if (shapeStyle === 'rounded') { dt = 'rounded'; cs = 'extra-rounded'; cd = 'dot'; }
-            else if (shapeStyle === 'dots') { dt = 'dots'; cs = 'extra-rounded'; cd = 'dot'; }
+            // 1. 更新 QR
             qrCodeStyling.update({
                 data: url,
-                dotsOptions: { color: fgColor, type: dt },
-                backgroundOptions: { color: "#ffffff00" }, // 透明背景讓畫布控制
-                cornersSquareOptions: { color: fgColor, type: cs },
-                cornersDotOptions: { color: fgColor, type: cd }
+                dotsOptions: { color: fgColor, type: document.getElementById('shape-style').value },
+                backgroundOptions: { color: "#ffffff00" },
+                cornersSquareOptions: { color: fgColor },
             });
 
-            // 2. 計算畫布尺寸
-            // 文字所佔的垂直高度
-            const textBlockHeight = (position === 'middle') ? 0 : (titleSize + titleMargin);
+            const textBlockHeight = titleSize + 10;
             finalCanvas.width = QR_SIZE + pLeft + pRight;
             finalCanvas.height = QR_SIZE + pTop + pBottom + textBlockHeight;
 
-            // 更新顯示尺寸
-            document.getElementById('canvas-dim').innerText = `${finalCanvas.width} x ${finalCanvas.height} px`;
-
-            // 3. 繪製
             const qrBlob = await qrCodeStyling.getRawData('png');
             const qrImg = new Image();
             qrImg.src = URL.createObjectURL(qrBlob);
 
             qrImg.onload = () => {
-                // 背景
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-                // 計算位置
-                let qrX = pLeft;
                 let qrY = (position === 'top') ? (pTop + textBlockHeight) : pTop;
-                ctx.drawImage(qrImg, qrX, qrY, QR_SIZE, QR_SIZE);
+                ctx.drawImage(qrImg, pLeft, qrY, QR_SIZE, QR_SIZE);
 
-                // 文字
+                // 2. 畫造型外框
+                if (theme !== 'none') {
+                    ctx.strokeStyle = textColor;
+                    ctx.lineWidth = fWidth;
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.beginPath();
+                    
+                    const w = finalCanvas.width, h = finalCanvas.height;
+                    const m = fWidth + 10; // 稍微往內縮一點
+
+                    if (theme === 'water') {
+                        // 水滴造型：上方尖，下方圓
+                        ctx.moveTo(w/2, m);
+                        ctx.bezierCurveTo(w - m, h/2, w - m, h - m, w/2, h - m);
+                        ctx.bezierCurveTo(m, h - m, m, h/2, w/2, m);
+                    } else if (theme === 'fire') {
+                        // 太陽/火元素：鋸齒狀
+                        const steps = 16, rX = w/2 - m, rY = h/2 - m;
+                        for(let i=0; i<=steps; i++) {
+                            let angle = (i/steps) * Math.PI * 2;
+                            let r = (i%2 === 0) ? 1 : 0.85;
+                            let x = w/2 + Math.cos(angle) * rX * r;
+                            let y = h/2 + Math.sin(angle) * rY * r;
+                            if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                        }
+                    } else if (theme === 'heart') {
+                        // 愛心造型
+                        const topY = h * 0.2;
+                        ctx.moveTo(w/2, h*0.3);
+                        ctx.bezierCurveTo(w/2, topY, m, topY, m, h*0.5);
+                        ctx.bezierCurveTo(m, h*0.8, w/2, h-m, w/2, h-m);
+                        ctx.bezierCurveTo(w/2, h-m, w-m, h*0.8, w-m, h*0.5);
+                        ctx.bezierCurveTo(w-m, topY, w/2, topY, w/2, h*0.3);
+                    } else if (theme === 'leaf') {
+                        // 葉子造型
+                        ctx.moveTo(m, h-m);
+                        ctx.quadraticCurveTo(w-m, h-m, w-m, m);
+                        ctx.quadraticCurveTo(m, m, m, h-m);
+                        // 加一片葉脈
+                        ctx.moveTo(m, h-m); ctx.lineTo(w/2, h/2);
+                    }
+                    ctx.stroke();
+                }
+
+                // 3. 畫文字
                 if (title) {
                     ctx.fillStyle = textColor;
                     ctx.font = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
                     ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-
                     let tx = finalCanvas.width / 2;
-                    let ty;
-                    if (position === 'top') {
-                        ty = pTop + (titleSize / 2);
-                    } else if (position === 'bottom') {
-                        ty = finalCanvas.height - pBottom - (titleSize / 2);
-                    } else { // middle
-                        ty = pTop + (QR_SIZE / 2);
-                        const textWidth = ctx.measureText(title).width + 20;
-                        ctx.fillStyle = "#ffffff";
-                        ctx.fillRect(tx - textWidth / 2, ty - titleSize / 2 - 5, textWidth, titleSize + 10);
-                        ctx.fillStyle = textColor;
-                    }
+                    let ty = (position === 'top') ? (pTop + titleSize/2) : (finalCanvas.height - pBottom - titleSize/2);
                     ctx.fillText(title, tx, ty);
                 }
                 URL.revokeObjectURL(qrImg.src);
@@ -239,8 +228,8 @@
         function downloadQR() {
             const canvas = document.getElementById('final-canvas');
             const link = document.createElement('a');
-            link.download = `SJPS-QR-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.download = `SJPS-Style-QR.png`;
+            link.href = canvas.toDataURL();
             link.click();
         }
     </script>
