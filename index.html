@@ -7,7 +7,6 @@
     <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
             background: #eef2f7;
@@ -16,8 +15,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* ── Top bar ── */
         header {
             background: #1e3a5f;
             color: #fff;
@@ -30,8 +27,6 @@
         }
         header h1 { font-size: 15px; font-weight: 900; letter-spacing: .05em; }
         header span { font-size: 11px; color: #93c5fd; }
-
-        /* ── Main layout ── */
         main {
             flex: 1;
             display: grid;
@@ -40,8 +35,6 @@
             padding: 12px;
             min-height: 0;
         }
-
-        /* ── Panel ── */
         .panel {
             background: #fff;
             border-radius: 14px;
@@ -52,7 +45,6 @@
             overflow: hidden;
             box-shadow: 0 1px 6px rgba(0,0,0,.08);
         }
-
         .section-label {
             font-size: 10px;
             font-weight: 900;
@@ -62,11 +54,8 @@
             border-bottom: 1px solid #e2e8f0;
             padding-bottom: 4px;
         }
-
-        /* ── Form rows ── */
         .row { display: flex; flex-direction: column; gap: 3px; }
         .row label { font-size: 10px; font-weight: 700; color: #475569; }
-
         input[type="text"], input[type="number"], select {
             width: 100%;
             padding: 6px 9px;
@@ -78,14 +67,9 @@
             outline: none;
             transition: border-color .15s;
         }
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            border-color: #3b82f6;
-        }
-
+        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: #3b82f6; }
         .url-row { display: flex; gap: 6px; }
         .url-row input { flex: 1; }
-
-        /* 縮址按鈕 */
         #short-btn {
             padding: 0 10px;
             background: #4f46e5;
@@ -98,18 +82,11 @@
             white-space: nowrap;
             font-family: inherit;
             transition: background .15s;
+            flex-shrink: 0;
         }
         #short-btn:hover { background: #4338ca; }
         #short-btn:disabled { background: #94a3b8; cursor: default; }
-
-        #shorten-msg {
-            font-size: 10px;
-            color: #94a3b8;
-            min-height: 14px;
-            line-height: 1.4;
-        }
-
-        /* 色票 row */
+        #shorten-msg { font-size: 10px; color: #94a3b8; min-height: 14px; line-height: 1.4; }
         .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .color-item {
             display: flex; align-items: center; gap: 6px;
@@ -124,8 +101,6 @@
         }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
-
-        /* 數字微調 */
         .stepper { display: flex; align-items: center; gap: 4px; }
         .stepper button {
             width: 26px; height: 26px; border: 1.5px solid #cbd5e1;
@@ -135,8 +110,6 @@
         }
         .stepper button:hover { background: #e2e8f0; }
         .stepper input { width: 44px; text-align: center; font-size: 12px; }
-
-        /* range */
         input[type="range"] {
             width: 100%; accent-color: #3b82f6; cursor: pointer;
             height: 4px; border: none; background: none; padding: 0;
@@ -144,11 +117,7 @@
         .range-row { display: flex; align-items: center; gap: 6px; }
         .range-row label { font-size: 10px; font-weight: 700; color: #64748b; width: 52px; flex-shrink: 0; }
         .range-val { font-size: 10px; color: #3b82f6; font-weight: 700; width: 22px; text-align: right; }
-
-        /* padding grid */
         .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
-
-        /* ── Preview panel ── */
         .preview-panel {
             background: #fff;
             border-radius: 14px;
@@ -159,10 +128,7 @@
             min-height: 0;
             box-shadow: 0 1px 6px rgba(0,0,0,.08);
         }
-        .preview-header {
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0;
-        }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .preview-header .ttl { font-size: 11px; font-weight: 900; color: #475569; }
         #canvas-dim {
             font-size: 10px; font-weight: 700; font-family: monospace;
@@ -170,7 +136,6 @@
             padding: 3px 10px; border-radius: 999px;
             border: 1px solid #bfdbfe;
         }
-
         .preview-area {
             flex: 1;
             display: flex; align-items: center; justify-content: center;
@@ -182,14 +147,8 @@
             min-height: 0;
             overflow: auto;
         }
-        .preview-area .card {
-            background: #fff;
-            box-shadow: 0 4px 24px rgba(0,0,0,.12);
-            line-height: 0;
-        }
+        .preview-area .card { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,.12); line-height: 0; }
         #final-canvas { display: block; max-width: 100%; max-height: 100%; }
-
-        /* download btn */
         #dl-btn {
             width: 100%; padding: 11px;
             background: #1e3a5f; color: #fff;
@@ -202,6 +161,51 @@
         }
         #dl-btn:hover { background: #1e40af; }
         #dl-btn svg { width: 18px; height: 18px; }
+
+        /* 縮址彈出層 */
+        #manual-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.45);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        #manual-overlay.show { display: flex; }
+        .manual-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            width: 380px;
+            box-shadow: 0 8px 40px rgba(0,0,0,.2);
+        }
+        .manual-box h2 { font-size: 14px; font-weight: 900; color: #1e3a5f; margin-bottom: 8px; }
+        .manual-box p  { font-size: 11px; color: #64748b; margin-bottom: 12px; line-height: 1.6; }
+        .manual-box .services { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .manual-box .services a {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 12px; background: #f1f5f9;
+            border-radius: 8px; text-decoration: none;
+            font-size: 11px; font-weight: 700; color: #1e3a5f;
+            transition: background .15s;
+        }
+        .manual-box .services a:hover { background: #e2e8f0; }
+        .manual-box .services a span { font-weight: 400; color: #64748b; margin-left: auto; font-size: 10px; }
+        .manual-box .paste-row { display: flex; gap: 6px; }
+        .manual-box .paste-row input { flex: 1; }
+        .manual-box .paste-row button {
+            padding: 6px 12px; background: #1e3a5f; color: #fff;
+            border: none; border-radius: 8px; font-size: 11px;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+            white-space: nowrap;
+        }
+        .manual-box .close-btn {
+            margin-top: 10px; width: 100%; padding: 8px;
+            background: none; border: 1.5px solid #e2e8f0;
+            border-radius: 8px; font-size: 11px; font-weight: 700;
+            color: #94a3b8; cursor: pointer; font-family: inherit;
+        }
+        .manual-box .close-btn:hover { background: #f8fafc; }
     </style>
 </head>
 <body>
@@ -212,11 +216,8 @@
 </header>
 
 <main>
-    <!-- ── 左側控制面板 ── -->
     <div class="panel">
-
         <div class="section-label">網址 &amp; 標題</div>
-
         <div class="row">
             <label>QR Code 網址</label>
             <div class="url-row">
@@ -225,14 +226,12 @@
             </div>
             <span id="shorten-msg"></span>
         </div>
-
         <div class="row">
             <label>顯示標題文字</label>
             <input type="text" id="title-input" value="新莊國小" class="au">
         </div>
 
         <div class="section-label">文字設定</div>
-
         <div class="row">
             <label>標題位置</label>
             <select id="text-position" class="au">
@@ -241,7 +240,6 @@
                 <option value="middle">文字在中間</option>
             </select>
         </div>
-
         <div class="row">
             <label>字體大小</label>
             <div class="stepper">
@@ -250,7 +248,6 @@
                 <button onclick="adj('title-size', 2)">＋</button>
             </div>
         </div>
-
         <div class="range-row">
             <label>文字間距</label>
             <input type="range" id="title-margin" min="0" max="100" value="10" class="au">
@@ -258,7 +255,6 @@
         </div>
 
         <div class="section-label">外觀</div>
-
         <div class="row">
             <label>QR 樣式</label>
             <select id="shape-style" class="au">
@@ -267,7 +263,6 @@
                 <option value="dots">圓點風格</option>
             </select>
         </div>
-
         <div class="color-row">
             <div class="color-item">
                 <input type="color" id="fg-color" value="#000000" class="au">
@@ -280,17 +275,14 @@
         </div>
 
         <div class="section-label">留白 (Padding)</div>
-
         <div class="pad-grid">
             <div class="range-row"><label>上</label><input type="range" id="pad-top"    min="0" max="150" value="30" class="au"><span class="range-val" id="pad-top-v">30</span></div>
             <div class="range-row"><label>下</label><input type="range" id="pad-bottom" min="0" max="150" value="30" class="au"><span class="range-val" id="pad-bottom-v">30</span></div>
             <div class="range-row"><label>左</label><input type="range" id="pad-left"   min="0" max="150" value="30" class="au"><span class="range-val" id="pad-left-v">30</span></div>
             <div class="range-row"><label>右</label><input type="range" id="pad-right"  min="0" max="150" value="30" class="au"><span class="range-val" id="pad-right-v">30</span></div>
         </div>
-
     </div>
 
-    <!-- ── 右側預覽 ── -->
     <div class="preview-panel">
         <div class="preview-header">
             <span class="ttl">即時預覽</span>
@@ -308,6 +300,21 @@
     </div>
 </main>
 
+<!-- 手動縮址彈出層 -->
+<div id="manual-overlay">
+    <div class="manual-box">
+        <h2>🔗 手動縮址</h2>
+        <p>因瀏覽器安全限制，無法直接呼叫縮址 API。<br>請用以下任一服務產生短網址，再貼回下方：</p>
+        <div class="services" id="service-links"></div>
+        <p style="font-size:10px;color:#94a3b8;margin-bottom:8px;">貼上短網址後按「套用」：</p>
+        <div class="paste-row">
+            <input type="text" id="manual-short-input" placeholder="https://reurl.cc/xxxxx">
+            <button onclick="applyManual()">套用</button>
+        </div>
+        <button class="close-btn" onclick="closeOverlay()">取消</button>
+    </div>
+</div>
+
 <script>
     const QR_SIZE = 300;
     const qr = new QRCodeStyling({
@@ -315,7 +322,6 @@
         qrOptions: { errorCorrectionLevel: 'H' }
     });
 
-    // 同步 range 顯示值
     const rangeSync = {
         'title-margin': 'title-margin-val',
         'pad-top':    'pad-top-v',
@@ -338,8 +344,14 @@
         generateQR();
     }
 
-    // ── 縮址：使用 CleanURI（支援 CORS + HTTPS）──────────────────────────
-    // 備用策略：先試 CleanURI，失敗改試 ulvis.net，都失敗給出友善提示
+    // ── 縮址：CORS 全擋時改為彈出手動輔助面板 ───────────────────────────
+    const SHORTEN_SERVICES = [
+        { name: 'reurl.cc（國內推薦）', url: 'https://reurl.cc/', note: '中文友善' },
+        { name: 'bitly.com',            url: 'https://bitly.com/', note: '需免費帳號' },
+        { name: 'tinyurl.com',          url: 'https://tinyurl.com/', note: '不需帳號' },
+        { name: 'short.io',             url: 'https://short.io/', note: '自訂短域名' },
+    ];
+
     async function shortenURL() {
         const urlEl = document.getElementById('url-input');
         const btn   = document.getElementById('short-btn');
@@ -348,54 +360,73 @@
         if (!orig) { showMsg('⚠️ 請先填入網址', 'warn'); return; }
 
         btn.disabled = true; btn.textContent = '…';
-        showMsg('正在縮址…', 'info');
+        showMsg('嘗試自動縮址…', 'info');
 
-        const apis = [
-            () => fetchCleanUri(orig),
-            () => fetchTinyPng(orig),   // 備用
-        ];
-
-        for (const fn of apis) {
-            try {
-                const short = await fn();
-                if (short && short.startsWith('http')) {
-                    urlEl.value = short;
+        // 嘗試 shrtco.de — 有正確 CORS header 且免費
+        try {
+            const res = await fetch(
+                `https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(orig)}`,
+                { signal: AbortSignal.timeout(5000) }
+            );
+            if (res.ok) {
+                const j = await res.json();
+                if (j.ok && j.result?.full_short_link) {
+                    urlEl.value = j.result.full_short_link;
                     generateQR();
-                    showMsg(`✅ 縮址成功`, 'ok');
+                    showMsg('✅ 縮址成功！', 'ok');
+                    btn.disabled = false; btn.textContent = '縮址';
                     return;
                 }
-            } catch (_) { /* 試下一個 */ }
-        }
-        showMsg('❌ 網路無法連線縮址服務，請手動貼上短網址', 'err');
+            }
+        } catch (_) { /* fall through */ }
+
+        // 全部失敗 → 開啟手動輔助彈窗
+        showMsg('ℹ️ 自動縮址受限，請手動操作', 'info');
         btn.disabled = false; btn.textContent = '縮址';
+        openOverlay(orig);
     }
 
-    async function fetchCleanUri(url) {
-        const res = await fetch('https://cleanuri.com/api/v1/shorten', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'url=' + encodeURIComponent(url)
+    function openOverlay(orig) {
+        const list = document.getElementById('service-links');
+        list.innerHTML = '';
+        SHORTEN_SERVICES.forEach(s => {
+            // 把原始網址帶入服務（能直帶就直帶）
+            const a = document.createElement('a');
+            a.href = s.url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.innerHTML = `🔗 ${s.name} <span>${s.note}</span>`;
+            list.appendChild(a);
         });
-        const j = await res.json();
-        return j.result_url;
+        document.getElementById('manual-short-input').value = '';
+        document.getElementById('manual-overlay').classList.add('show');
     }
 
-    // 備用：ulvis.net
-    async function fetchTinyPng(url) {
-        const res = await fetch(`https://ulvis.net/api.php?url=${encodeURIComponent(url)}&private=1`);
-        const t = (await res.text()).trim();
-        return t.startsWith('http') ? t : null;
+    function applyManual() {
+        const val = document.getElementById('manual-short-input').value.trim();
+        if (!val.startsWith('http')) {
+            alert('請輸入完整的短網址（以 http 開頭）');
+            return;
+        }
+        document.getElementById('url-input').value = val;
+        generateQR();
+        showMsg('✅ 短網址已套用', 'ok');
+        closeOverlay();
     }
+
+    function closeOverlay() {
+        document.getElementById('manual-overlay').classList.remove('show');
+    }
+
+    // 點彈窗外部關閉
+    document.getElementById('manual-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeOverlay();
+    });
 
     function showMsg(text, type) {
         const el = document.getElementById('shorten-msg');
         el.textContent = text;
         el.style.color = { ok:'#10b981', err:'#ef4444', warn:'#f59e0b', info:'#94a3b8' }[type];
-        // 成功後自動重設按鈕
-        if (type === 'ok' || type === 'err') {
-            document.getElementById('short-btn').disabled = false;
-            document.getElementById('short-btn').textContent = '縮址';
-        }
     }
 
     // ── 產生 QR ───────────────────────────────────────────────────────────
@@ -438,17 +469,15 @@
         img.onload = () => {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             const qrY = (position === 'top' && title) ? (pT + textH) : pT;
             ctx.drawImage(img, pL, qrY, QR_SIZE, QR_SIZE);
-
             if (title) {
                 ctx.font = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const tx = canvas.width / 2;
                 let ty;
-                if (position === 'top')    ty = pT + titleSize / 2;
+                if (position === 'top')         ty = pT + titleSize / 2;
                 else if (position === 'bottom') ty = canvas.height - pB - titleSize / 2;
                 else {
                     ty = pT + QR_SIZE / 2;
