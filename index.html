@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新莊國小 QRcode 專業排版產生器</title>
     <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 改用 standalone Tailwind CSS，避免 CDN 警告 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; }
         input[type="color"] { -webkit-appearance: none; border: none; width: 100%; height: 40px; cursor: pointer; border-radius: 8px; overflow: hidden; }
@@ -16,38 +17,46 @@
             background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px;
             border-radius: 1.5rem;
         }
+        /* 補回 Tailwind v2 沒有的 rounded-3xl / rounded-2xl */
+        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-xl  { border-radius: 0.75rem; }
+        /* 縮址狀態提示 */
+        #shorten-msg { font-size: 0.65rem; min-height: 1rem; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-gray-100 min-h-screen p-4">
 
     <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
         
-        <div class="w-full lg:w-96 space-y-5 bg-white p-6 rounded-3xl shadow-xl border border-slate-200">
+        <div class="w-full lg:w-96 space-y-5 bg-white p-6 rounded-3xl shadow-xl border border-gray-200">
              <div class="border-b pb-3">
                 <h1 class="text-2xl font-black text-blue-900">新莊國小 QR 產生器</h1>
-                <p class="text-xs text-slate-500 font-bold mt-1">專業排版模式</p>
+                <p class="text-xs text-gray-500 font-bold mt-1">專業排版模式</p>
              </div>
             
             <div class="space-y-3">
                 <label class="block text-sm font-bold text-gray-700">內容與標題</label>
                 <div class="flex gap-2">
-                    <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="auto-update flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="shortenURL()" id="short-btn" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded-xl hover:bg-indigo-700 transition">縮址</button>
+                    <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="auto-update flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="shortenURL()" id="short-btn" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded-xl hover:bg-indigo-700 transition-all">縮址</button>
                 </div>
-                <input type="text" id="title-input" value="新莊國小" class="auto-update w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- 縮址結果提示 -->
+                <p id="shorten-msg" class="text-gray-400"></p>
+                <input type="text" id="title-input" value="新莊國小" class="auto-update w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 space-y-4">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-black text-blue-800 uppercase">標題字體大小</span>
                     <div class="flex items-center gap-1">
-                        <button onclick="adjustValue('title-size', -2)" class="w-8 h-8 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">-</button>
+                        <button onclick="adjustValue('title-size', -2)" class="w-8 h-8 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">-</button>
                         <input type="number" id="title-size" value="28" class="auto-update w-12 text-center bg-transparent font-bold text-blue-900">
-                        <button onclick="adjustValue('title-size', 2)" class="w-8 h-8 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">+</button>
+                        <button onclick="adjustValue('title-size', 2)" class="w-8 h-8 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">+</button>
                     </div>
                 </div>
                 <div>
-                    <div class="flex justify-between mb-1 text-[10px] font-bold text-slate-500">
+                    <div class="flex justify-between mb-1 text-xs font-bold text-gray-500">
                         <span>文字與 QR 距離</span>
                         <span id="title-margin-val">10</span>
                     </div>
@@ -55,9 +64,9 @@
                 </div>
             </div>
 
-            <div class="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <label class="block text-xs font-black text-slate-700 uppercase tracking-widest">圖片留白 (Padding)</label>
-                <div class="grid grid-cols-2 gap-4 text-[10px] font-bold text-slate-400">
+            <div class="space-y-3 p-4 bg-gray-50 rounded-2xl border border-gray-200">
+                <label class="block text-xs font-black text-gray-700 uppercase tracking-widest">圖片留白 (Padding)</label>
+                <div class="grid grid-cols-2 gap-4 text-xs font-bold text-gray-400">
                     <div>上邊距 <input type="range" id="pad-top" min="0" max="150" value="30" class="auto-update w-full"></div>
                     <div>下邊距 <input type="range" id="pad-bottom" min="0" max="150" value="30" class="auto-update w-full"></div>
                     <div>左邊距 <input type="range" id="pad-left" min="0" max="150" value="30" class="auto-update w-full"></div>
@@ -66,23 +75,23 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <select id="shape-style" class="auto-update px-2 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-white">
+                <select id="shape-style" class="auto-update px-2 py-2 border border-gray-300 rounded-xl text-xs font-bold bg-white">
                     <option value="square">標準方形</option>
                     <option value="rounded">圓角方塊</option>
                     <option value="dots">圓點風格</option>
                 </select>
-                <select id="text-position" class="auto-update px-2 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-white">
+                <select id="text-position" class="auto-update px-2 py-2 border border-gray-300 rounded-xl text-xs font-bold bg-white">
                     <option value="top">標題在上方</option>
                     <option value="bottom" selected>標題在下方</option>
                     <option value="middle">文字在中間</option>
                 </select>
-                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border">
+                <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border">
                     <input type="color" id="fg-color" value="#000000" class="auto-update w-8 h-8">
-                    <span class="text-[10px] font-bold text-slate-600">QR 顏色</span>
+                    <span class="text-xs font-bold text-gray-600">QR 顏色</span>
                 </div>
-                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border">
+                <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border">
                     <input type="color" id="text-color" value="#000000" class="auto-update w-8 h-8">
-                    <span class="text-[10px] font-bold text-slate-600">文字顏色</span>
+                    <span class="text-xs font-bold text-gray-600">文字顏色</span>
                 </div>
             </div>
         </div>
@@ -90,20 +99,20 @@
         <div class="flex-1 flex flex-col gap-6">
             <div class="flex justify-between items-end">
                 <div class="flex flex-col">
-                    <span class="text-sm font-bold text-slate-500">即時預覽效果</span>
-                    <span class="text-[10px] text-slate-400 font-medium">下載圖檔將與此比例完全一致</span>
+                    <span class="text-sm font-bold text-gray-500">即時預覽效果</span>
+                    <span class="text-xs text-gray-400 font-medium">下載圖檔將與此比例完全一致</span>
                 </div>
                 <span id="canvas-dim" class="text-xs bg-white px-3 py-1 rounded-full shadow-sm font-mono font-bold text-blue-600 border border-blue-100">0 x 0 px</span>
             </div>
             
             <div id="preview-scroll-area">
-                <div class="bg-white shadow-2xl p-0 leading-[0]">
+                <div class="bg-white shadow-2xl p-0 leading-none">
                     <canvas id="final-canvas"></canvas>
                 </div>
             </div>
 
             <div class="flex justify-center">
-                <button onclick="downloadQR()" class="w-full max-w-md bg-blue-600 text-white py-5 rounded-3xl font-black text-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3">
+                <button onclick="downloadQR()" class="w-full max-w-lg bg-blue-600 text-white py-5 rounded-3xl font-black text-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
@@ -128,38 +137,71 @@
 
         document.querySelectorAll('.auto-update').forEach(el => {
             el.addEventListener('input', () => {
-                if(el.id === 'title-margin') document.getElementById('title-margin-val').innerText = el.value;
+                if (el.id === 'title-margin') {
+                    document.getElementById('title-margin-val').innerText = el.value;
+                }
                 generateQR();
             });
             el.addEventListener('change', generateQR);
         });
 
-        window.onload = () => { generateQR(); }
+        window.onload = () => { generateQR(); };
 
+        // ── 縮址：改用 is.gd（支援 HTTPS、有 CORS）──────────────────────
         async function shortenURL() {
             const urlInput = document.getElementById('url-input');
-            const btn = document.getElementById('short-btn');
+            const btn      = document.getElementById('short-btn');
+            const msg      = document.getElementById('shorten-msg');
+            const original = urlInput.value.trim();
+
+            if (!original) { msg.textContent = '⚠️ 請先輸入網址'; msg.style.color = '#f59e0b'; return; }
+
+            btn.textContent = '…';
+            btn.disabled = true;
+            msg.textContent = '正在縮址…';
+            msg.style.color = '#6b7280';
+
             try {
-                btn.innerText = "...";
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlInput.value)}`);
-                if (response.ok) { urlInput.value = await response.text(); generateQR(); }
-            } finally { btn.innerText = "縮址"; }
+                // is.gd 公開 API，支援 HTTPS + CORS
+                const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(original)}`;
+                const res = await fetch(apiUrl);
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const short = (await res.text()).trim();
+
+                // is.gd 在失敗時會回傳以 "Error:" 開頭的文字
+                if (!short || short.startsWith('Error:')) throw new Error(short || '縮址服務回應異常');
+
+                urlInput.value = short;
+                msg.textContent = `✅ 縮址成功！原始: ${original.length > 40 ? original.slice(0,40)+'…' : original}`;
+                msg.style.color = '#10b981';
+                generateQR();
+
+            } catch (err) {
+                console.error('縮址失敗:', err);
+                msg.textContent = `❌ 縮址失敗：${err.message}`;
+                msg.style.color = '#ef4444';
+            } finally {
+                btn.textContent = '縮址';
+                btn.disabled = false;
+            }
         }
+        // ────────────────────────────────────────────────────────────────
 
         async function generateQR() {
-            const url = document.getElementById('url-input').value || " ";
-            const title = document.getElementById('title-input').value;
-            const position = document.getElementById('text-position').value;
+            const url        = document.getElementById('url-input').value || " ";
+            const title      = document.getElementById('title-input').value;
+            const position   = document.getElementById('text-position').value;
             const shapeStyle = document.getElementById('shape-style').value;
-            const fgColor = document.getElementById('fg-color').value;
-            const textColor = document.getElementById('text-color').value;
+            const fgColor    = document.getElementById('fg-color').value;
+            const textColor  = document.getElementById('text-color').value;
             
-            const titleSize = parseInt(document.getElementById('title-size').value);
+            const titleSize   = parseInt(document.getElementById('title-size').value);
             const titleMargin = parseInt(document.getElementById('title-margin').value);
-            const pTop = parseInt(document.getElementById('pad-top').value);
+            const pTop    = parseInt(document.getElementById('pad-top').value);
             const pBottom = parseInt(document.getElementById('pad-bottom').value);
-            const pLeft = parseInt(document.getElementById('pad-left').value);
-            const pRight = parseInt(document.getElementById('pad-right').value);
+            const pLeft   = parseInt(document.getElementById('pad-left').value);
+            const pRight  = parseInt(document.getElementById('pad-right').value);
 
             const finalCanvas = document.getElementById('final-canvas');
             const ctx = finalCanvas.getContext('2d');
@@ -173,34 +215,35 @@
                 dotsOptions: { color: fgColor, type: dt },
                 backgroundOptions: { color: "#ffffff" },
                 cornersSquareOptions: { color: fgColor, type: cs },
-                cornersDotOptions: { color: fgColor, type: cd }
+                cornersDotOptions:   { color: fgColor, type: cd }
             });
 
             const textBlockHeight = (position === 'middle' || !title) ? 0 : (titleSize + titleMargin);
-            finalCanvas.width = QR_SIZE + pLeft + pRight;
-            finalCanvas.height = QR_SIZE + pTop + pBottom + textBlockHeight;
+            finalCanvas.width  = QR_SIZE + pLeft + pRight;
+            finalCanvas.height = QR_SIZE + pTop  + pBottom + textBlockHeight;
             document.getElementById('canvas-dim').innerText = `${finalCanvas.width} x ${finalCanvas.height} px`;
 
             const qrBlob = await qrCodeStyling.getRawData('png');
-            const qrImg = new Image();
+            const qrImg  = new Image();
             qrImg.src = URL.createObjectURL(qrBlob);
 
             qrImg.onload = () => {
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-                let qrX = pLeft;
-                let qrY = (position === 'top' && title) ? (pTop + textBlockHeight) : pTop;
+                const qrX = pLeft;
+                const qrY = (position === 'top' && title) ? (pTop + textBlockHeight) : pTop;
                 ctx.drawImage(qrImg, qrX, qrY, QR_SIZE, QR_SIZE);
 
                 if (title) {
-                    ctx.fillStyle = textColor;
-                    ctx.font = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
-                    ctx.textAlign = "center";
+                    ctx.fillStyle  = textColor;
+                    ctx.font       = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
+                    ctx.textAlign  = "center";
                     ctx.textBaseline = "middle";
 
-                    let tx = finalCanvas.width / 2;
+                    const tx = finalCanvas.width / 2;
                     let ty;
+
                     if (position === 'top') {
                         ty = pTop + (titleSize / 2);
                     } else if (position === 'bottom') {
@@ -220,7 +263,7 @@
 
         function downloadQR() {
             const canvas = document.getElementById('final-canvas');
-            const link = document.createElement('a');
+            const link   = document.createElement('a');
             link.download = `SJPS-QR-${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
