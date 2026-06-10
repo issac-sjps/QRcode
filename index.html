@@ -3,264 +3,475 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新莊國小 QRcode 專業排版產生器</title>
-    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>新莊國小 QR Code 產生器</title>
+    <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; }
-        input[type="color"] { -webkit-appearance: none; border: none; width: 100%; height: 40px; cursor: pointer; border-radius: 8px; overflow: hidden; }
-        input[type="range"] { cursor: pointer; accent-color: #2563eb; }
-        #preview-scroll-area { 
-            min-height: 450px; display: flex; align-items: center; justify-content: center;
-            border: 2px dashed #cbd5e1; background-color: #f8fafc;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px;
-            border-radius: 1.5rem;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: #eef2f7;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* ── Top bar ── */
+        header {
+            background: #1e3a5f;
+            color: #fff;
+            padding: 0 20px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        header h1 { font-size: 15px; font-weight: 900; letter-spacing: .05em; }
+        header span { font-size: 11px; color: #93c5fd; }
+
+        /* ── Main layout ── */
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 12px;
+            padding: 12px;
+            min-height: 0;
+        }
+
+        /* ── Panel ── */
+        .panel {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+        }
+
+        /* ── Form rows ── */
+        .row { display: flex; flex-direction: column; gap: 3px; }
+        .row label { font-size: 10px; font-weight: 700; color: #475569; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 6px 9px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: inherit;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color .15s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            border-color: #3b82f6;
+        }
+
+        .url-row { display: flex; gap: 6px; }
+        .url-row input { flex: 1; }
+
+        /* 縮址按鈕 */
+        #short-btn {
+            padding: 0 10px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+            transition: background .15s;
+        }
+        #short-btn:hover { background: #4338ca; }
+        #short-btn:disabled { background: #94a3b8; cursor: default; }
+
+        #shorten-msg {
+            font-size: 10px;
+            color: #94a3b8;
+            min-height: 14px;
+            line-height: 1.4;
+        }
+
+        /* 色票 row */
+        .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .color-item {
+            display: flex; align-items: center; gap: 6px;
+            background: #f8fafc; border: 1.5px solid #e2e8f0;
+            border-radius: 8px; padding: 4px 8px;
+        }
+        .color-item label { font-size: 10px; font-weight: 700; color: #475569; }
+        input[type="color"] {
+            width: 28px; height: 28px; border: none; padding: 0;
+            border-radius: 6px; cursor: pointer; background: none;
+            -webkit-appearance: none;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
+
+        /* 數字微調 */
+        .stepper { display: flex; align-items: center; gap: 4px; }
+        .stepper button {
+            width: 26px; height: 26px; border: 1.5px solid #cbd5e1;
+            background: #f8fafc; border-radius: 6px; cursor: pointer;
+            font-size: 14px; font-weight: 700; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .stepper button:hover { background: #e2e8f0; }
+        .stepper input { width: 44px; text-align: center; font-size: 12px; }
+
+        /* range */
+        input[type="range"] {
+            width: 100%; accent-color: #3b82f6; cursor: pointer;
+            height: 4px; border: none; background: none; padding: 0;
+        }
+        .range-row { display: flex; align-items: center; gap: 6px; }
+        .range-row label { font-size: 10px; font-weight: 700; color: #64748b; width: 52px; flex-shrink: 0; }
+        .range-val { font-size: 10px; color: #3b82f6; font-weight: 700; width: 22px; text-align: right; }
+
+        /* padding grid */
+        .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+
+        /* ── Preview panel ── */
+        .preview-panel {
+            background: #fff;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px;
+            min-height: 0;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
+        .preview-header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .preview-header .ttl { font-size: 11px; font-weight: 900; color: #475569; }
+        #canvas-dim {
+            font-size: 10px; font-weight: 700; font-family: monospace;
+            color: #3b82f6; background: #eff6ff;
+            padding: 3px 10px; border-radius: 999px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .preview-area {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            background: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 18px 18px;
+            border-radius: 10px;
+            border: 1.5px dashed #cbd5e1;
+            min-height: 0;
+            overflow: auto;
+        }
+        .preview-area .card {
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(0,0,0,.12);
+            line-height: 0;
+        }
+        #final-canvas { display: block; max-width: 100%; max-height: 100%; }
+
+        /* download btn */
+        #dl-btn {
+            width: 100%; padding: 11px;
+            background: #1e3a5f; color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 900;
+            cursor: pointer; font-family: inherit;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+        #dl-btn:hover { background: #1e40af; }
+        #dl-btn svg { width: 18px; height: 18px; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+<body>
 
-    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
-        
-        <div class="w-full lg:w-96 space-y-5 bg-white p-6 rounded-3xl shadow-xl border border-slate-200">
-             <div class="border-b pb-3">
-                <h1 class="text-2xl font-black text-blue-900">新莊國小 QR 產生器</h1>
-                <p class="text-xs text-slate-500 font-bold mt-1">專業排版模式</p>
-             </div>
-            
-            <div class="space-y-3">
-                <label class="block text-sm font-bold text-gray-700">內容與標題</label>
-                <div class="flex gap-2">
-                    <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="auto-update flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="shortenURL()" id="short-btn" class="px-4 py-1 bg-indigo-600 text-white text-xs rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">縮址</button>
-                </div>
-                <input type="text" id="title-input" value="新莊國小" class="auto-update w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
+<header>
+    <h1>新莊國小 QR Code 產生器</h1>
+    <span>專業排版模式</span>
+</header>
+
+<main>
+    <!-- ── 左側控制面板 ── -->
+    <div class="panel">
+
+        <div class="section-label">網址 &amp; 標題</div>
+
+        <div class="row">
+            <label>QR Code 網址</label>
+            <div class="url-row">
+                <input type="text" id="url-input" value="https://www.sjps.kh.edu.tw/" class="au">
+                <button id="short-btn" onclick="shortenURL()">縮址</button>
             </div>
+            <span id="shorten-msg"></span>
+        </div>
 
-            <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-black text-blue-800 uppercase">標題字體大小</span>
-                    <div class="flex items-center gap-1">
-                        <button onclick="adjustValue('title-size', -2)" class="w-8 h-8 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">-</button>
-                        <input type="number" id="title-size" value="28" class="auto-update w-12 text-center bg-transparent font-bold text-blue-900">
-                        <button onclick="adjustValue('title-size', 2)" class="w-8 h-8 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-gray-100 font-bold">+</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-1 text-[10px] font-bold text-slate-500">
-                        <span>文字與 QR 距離</span>
-                        <span id="title-margin-val">10</span>
-                    </div>
-                    <input type="range" id="title-margin" min="0" max="100" value="10" class="auto-update w-full">
-                </div>
-            </div>
+        <div class="row">
+            <label>顯示標題文字</label>
+            <input type="text" id="title-input" value="新莊國小" class="au">
+        </div>
 
-            <div class="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <label class="block text-xs font-black text-slate-700 uppercase tracking-widest">圖片留白 (Padding)</label>
-                <div class="grid grid-cols-2 gap-4 text-[10px] font-bold text-slate-400">
-                    <div>上邊距 <input type="range" id="pad-top" min="0" max="150" value="30" class="auto-update w-full"></div>
-                    <div>下邊距 <input type="range" id="pad-bottom" min="0" max="150" value="30" class="auto-update w-full"></div>
-                    <div>左邊距 <input type="range" id="pad-left" min="0" max="150" value="30" class="auto-update w-full"></div>
-                    <div>右邊距 <input type="range" id="pad-right" min="0" max="150" value="30" class="auto-update w-full"></div>
-                </div>
-            </div>
+        <div class="section-label">文字設定</div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <select id="shape-style" class="auto-update px-2 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-white">
-                    <option value="square">標準方形</option>
-                    <option value="rounded">圓角方塊</option>
-                    <option value="dots">圓點風格</option>
-                </select>
-                <select id="text-position" class="auto-update px-2 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-white">
-                    <option value="top">標題在上方</option>
-                    <option value="bottom" selected>標題在下方</option>
-                    <option value="middle">文字在中間</option>
-                </select>
-                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border">
-                    <input type="color" id="fg-color" value="#000000" class="auto-update w-8 h-8">
-                    <span class="text-[10px] font-bold text-slate-600">QR 顏色</span>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border">
-                    <input type="color" id="text-color" value="#000000" class="auto-update w-8 h-8">
-                    <span class="text-[10px] font-bold text-slate-600">文字顏色</span>
-                </div>
+        <div class="row">
+            <label>標題位置</label>
+            <select id="text-position" class="au">
+                <option value="top">標題在上方</option>
+                <option value="bottom" selected>標題在下方</option>
+                <option value="middle">文字在中間</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <label>字體大小</label>
+            <div class="stepper">
+                <button onclick="adj('title-size',-2)">−</button>
+                <input type="number" id="title-size" value="28" class="au">
+                <button onclick="adj('title-size', 2)">＋</button>
             </div>
         </div>
 
-        <div class="flex-1 flex flex-col gap-6">
-            <div class="flex justify-between items-end">
-                <div class="flex flex-col">
-                    <span class="text-sm font-bold text-slate-500">即時預覽效果</span>
-                    <span class="text-[10px] text-slate-400 font-medium">下載圖檔將與此比例完全一致</span>
-                </div>
-                <span id="canvas-dim" class="text-xs bg-white px-3 py-1 rounded-full shadow-sm font-mono font-bold text-blue-600 border border-blue-100">0 x 0 px</span>
-            </div>
-            
-            <div id="preview-scroll-area">
-                <div class="bg-white shadow-2xl p-0 leading-[0]">
-                    <canvas id="final-canvas"></canvas>
-                </div>
-            </div>
+        <div class="range-row">
+            <label>文字間距</label>
+            <input type="range" id="title-margin" min="0" max="100" value="10" class="au">
+            <span class="range-val" id="title-margin-val">10</span>
+        </div>
 
-            <div class="flex justify-center">
-                <button onclick="downloadQR()" class="w-full max-w-md bg-blue-600 text-white py-5 rounded-3xl font-black text-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    下載 QR Code 圖片
-                </button>
+        <div class="section-label">外觀</div>
+
+        <div class="row">
+            <label>QR 樣式</label>
+            <select id="shape-style" class="au">
+                <option value="square">標準方形</option>
+                <option value="rounded">圓角方塊</option>
+                <option value="dots">圓點風格</option>
+            </select>
+        </div>
+
+        <div class="color-row">
+            <div class="color-item">
+                <input type="color" id="fg-color" value="#000000" class="au">
+                <label>QR 顏色</label>
+            </div>
+            <div class="color-item">
+                <input type="color" id="text-color" value="#000000" class="au">
+                <label>文字顏色</label>
             </div>
         </div>
+
+        <div class="section-label">留白 (Padding)</div>
+
+        <div class="pad-grid">
+            <div class="range-row"><label>上</label><input type="range" id="pad-top"    min="0" max="150" value="30" class="au"><span class="range-val" id="pad-top-v">30</span></div>
+            <div class="range-row"><label>下</label><input type="range" id="pad-bottom" min="0" max="150" value="30" class="au"><span class="range-val" id="pad-bottom-v">30</span></div>
+            <div class="range-row"><label>左</label><input type="range" id="pad-left"   min="0" max="150" value="30" class="au"><span class="range-val" id="pad-left-v">30</span></div>
+            <div class="range-row"><label>右</label><input type="range" id="pad-right"  min="0" max="150" value="30" class="au"><span class="range-val" id="pad-right-v">30</span></div>
+        </div>
+
     </div>
 
-    <script>
-        const QR_SIZE = 300;
-        let qrCodeStyling = new QRCodeStyling({
-            width: QR_SIZE, height: QR_SIZE, type: "canvas",
-            qrOptions: { errorCorrectionLevel: 'H' }
-        });
+    <!-- ── 右側預覽 ── -->
+    <div class="preview-panel">
+        <div class="preview-header">
+            <span class="ttl">即時預覽</span>
+            <span id="canvas-dim">0 × 0 px</span>
+        </div>
+        <div class="preview-area">
+            <div class="card"><canvas id="final-canvas"></canvas></div>
+        </div>
+        <button id="dl-btn" onclick="downloadQR()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            下載 QR Code 圖片
+        </button>
+    </div>
+</main>
 
-        function adjustValue(id, amount) {
-            const input = document.getElementById(id);
-            input.value = parseInt(input.value) + amount;
+<script>
+    const QR_SIZE = 300;
+    const qr = new QRCodeStyling({
+        width: QR_SIZE, height: QR_SIZE, type: 'canvas',
+        qrOptions: { errorCorrectionLevel: 'H' }
+    });
+
+    // 同步 range 顯示值
+    const rangeSync = {
+        'title-margin': 'title-margin-val',
+        'pad-top':    'pad-top-v',
+        'pad-bottom': 'pad-bottom-v',
+        'pad-left':   'pad-left-v',
+        'pad-right':  'pad-right-v',
+    };
+
+    document.querySelectorAll('.au').forEach(el => {
+        el.addEventListener('input', () => {
+            if (rangeSync[el.id]) document.getElementById(rangeSync[el.id]).textContent = el.value;
             generateQR();
-        }
+        });
+        el.addEventListener('change', generateQR);
+    });
 
-        document.querySelectorAll('.auto-update').forEach(el => {
-            el.addEventListener('input', () => {
-                if(el.id === 'title-margin') document.getElementById('title-margin-val').innerText = el.value;
-                generateQR();
-            });
-            el.addEventListener('change', generateQR);
+    function adj(id, delta) {
+        const el = document.getElementById(id);
+        el.value = Math.max(8, parseInt(el.value) + delta);
+        generateQR();
+    }
+
+    // ── 縮址：使用 CleanURI（支援 CORS + HTTPS）──────────────────────────
+    // 備用策略：先試 CleanURI，失敗改試 ulvis.net，都失敗給出友善提示
+    async function shortenURL() {
+        const urlEl = document.getElementById('url-input');
+        const btn   = document.getElementById('short-btn');
+        const msg   = document.getElementById('shorten-msg');
+        const orig  = urlEl.value.trim();
+        if (!orig) { showMsg('⚠️ 請先填入網址', 'warn'); return; }
+
+        btn.disabled = true; btn.textContent = '…';
+        showMsg('正在縮址…', 'info');
+
+        const apis = [
+            () => fetchCleanUri(orig),
+            () => fetchTinyPng(orig),   // 備用
+        ];
+
+        for (const fn of apis) {
+            try {
+                const short = await fn();
+                if (short && short.startsWith('http')) {
+                    urlEl.value = short;
+                    generateQR();
+                    showMsg(`✅ 縮址成功`, 'ok');
+                    return;
+                }
+            } catch (_) { /* 試下一個 */ }
+        }
+        showMsg('❌ 網路無法連線縮址服務，請手動貼上短網址', 'err');
+        btn.disabled = false; btn.textContent = '縮址';
+    }
+
+    async function fetchCleanUri(url) {
+        const res = await fetch('https://cleanuri.com/api/v1/shorten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'url=' + encodeURIComponent(url)
+        });
+        const j = await res.json();
+        return j.result_url;
+    }
+
+    // 備用：ulvis.net
+    async function fetchTinyPng(url) {
+        const res = await fetch(`https://ulvis.net/api.php?url=${encodeURIComponent(url)}&private=1`);
+        const t = (await res.text()).trim();
+        return t.startsWith('http') ? t : null;
+    }
+
+    function showMsg(text, type) {
+        const el = document.getElementById('shorten-msg');
+        el.textContent = text;
+        el.style.color = { ok:'#10b981', err:'#ef4444', warn:'#f59e0b', info:'#94a3b8' }[type];
+        // 成功後自動重設按鈕
+        if (type === 'ok' || type === 'err') {
+            document.getElementById('short-btn').disabled = false;
+            document.getElementById('short-btn').textContent = '縮址';
+        }
+    }
+
+    // ── 產生 QR ───────────────────────────────────────────────────────────
+    async function generateQR() {
+        const url        = document.getElementById('url-input').value || ' ';
+        const title      = document.getElementById('title-input').value;
+        const position   = document.getElementById('text-position').value;
+        const shapeStyle = document.getElementById('shape-style').value;
+        const fgColor    = document.getElementById('fg-color').value;
+        const textColor  = document.getElementById('text-color').value;
+        const titleSize  = parseInt(document.getElementById('title-size').value) || 28;
+        const margin     = parseInt(document.getElementById('title-margin').value);
+        const pT = parseInt(document.getElementById('pad-top').value);
+        const pB = parseInt(document.getElementById('pad-bottom').value);
+        const pL = parseInt(document.getElementById('pad-left').value);
+        const pR = parseInt(document.getElementById('pad-right').value);
+
+        let dt='square', cs='square', cd='square';
+        if (shapeStyle==='rounded') { dt='rounded'; cs='extra-rounded'; cd='dot'; }
+        else if (shapeStyle==='dots') { dt='dots'; cs='extra-rounded'; cd='dot'; }
+
+        qr.update({
+            data: url,
+            dotsOptions: { color: fgColor, type: dt },
+            backgroundOptions: { color: '#ffffff' },
+            cornersSquareOptions: { color: fgColor, type: cs },
+            cornersDotOptions: { color: fgColor, type: cd }
         });
 
-        window.onload = () => { generateQR(); }
+        const textH = (position === 'middle' || !title) ? 0 : (titleSize + margin);
+        const canvas = document.getElementById('final-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width  = QR_SIZE + pL + pR;
+        canvas.height = QR_SIZE + pT + pB + textH;
+        document.getElementById('canvas-dim').textContent = `${canvas.width} × ${canvas.height} px`;
 
-        // ====== 修正後的縮址功能 ======
-        async function shortenURL() {
-            const urlInput = document.getElementById('url-input');
-            const btn = document.getElementById('short-btn');
-            const targetUrl = urlInput.value.trim();
+        const blob = await qr.getRawData('png');
+        const img  = new Image();
+        img.src = URL.createObjectURL(blob);
+        img.onload = () => {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            if (!targetUrl) {
-                alert("請先輸入網址！");
-                return;
+            const qrY = (position === 'top' && title) ? (pT + textH) : pT;
+            ctx.drawImage(img, pL, qrY, QR_SIZE, QR_SIZE);
+
+            if (title) {
+                ctx.font = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const tx = canvas.width / 2;
+                let ty;
+                if (position === 'top')    ty = pT + titleSize / 2;
+                else if (position === 'bottom') ty = canvas.height - pB - titleSize / 2;
+                else {
+                    ty = pT + QR_SIZE / 2;
+                    const tw = ctx.measureText(title).width + 20;
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(tx - tw/2, ty - titleSize/2 - 5, tw, titleSize + 10);
+                }
+                ctx.fillStyle = textColor;
+                ctx.fillText(title, tx, ty);
             }
+            URL.revokeObjectURL(img.src);
+        };
+    }
 
-            try {
-                // 防止重複點擊
-                btn.innerText = "處理中...";
-                btn.disabled = true;
+    function downloadQR() {
+        const c = document.getElementById('final-canvas');
+        const a = document.createElement('a');
+        a.download = `SJPS-QR-${Date.now()}.png`;
+        a.href = c.toDataURL('image/png');
+        a.click();
+    }
 
-                // 透過 allorigins.win 作為 CORS 代理，避免學校網路或瀏覽器安全性阻擋
-                const tinyUrlApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(tinyUrlApi)}`;
-
-                const response = await fetch(proxyUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`伺服器回應錯誤 (狀態碼: ${response.status})`);
-                }
-
-                const shortUrl = await response.text();
-                
-                if (shortUrl && shortUrl.startsWith("http")) {
-                    urlInput.value = shortUrl; 
-                    generateQR(); 
-                } else {
-                    throw new Error("回傳格式異常");
-                }
-
-            } catch (error) {
-                console.error("縮址發生錯誤:", error);
-                alert("自動縮址失敗！可能是學校網路阻擋或服務暫時無效。\n建議您：手動至網路上其他縮址網站產生後，再貼回來此欄位。");
-            } finally { 
-                // 無論成功或失敗，都把按鈕狀態復原
-                btn.innerText = "縮址"; 
-                btn.disabled = false;
-            }
-        }
-        // ==============================
-
-        async function generateQR() {
-            const url = document.getElementById('url-input').value || " ";
-            const title = document.getElementById('title-input').value;
-            const position = document.getElementById('text-position').value;
-            const shapeStyle = document.getElementById('shape-style').value;
-            const fgColor = document.getElementById('fg-color').value;
-            const textColor = document.getElementById('text-color').value;
-            
-            const titleSize = parseInt(document.getElementById('title-size').value);
-            const titleMargin = parseInt(document.getElementById('title-margin').value);
-            const pTop = parseInt(document.getElementById('pad-top').value);
-            const pBottom = parseInt(document.getElementById('pad-bottom').value);
-            const pLeft = parseInt(document.getElementById('pad-left').value);
-            const pRight = parseInt(document.getElementById('pad-right').value);
-
-            const finalCanvas = document.getElementById('final-canvas');
-            const ctx = finalCanvas.getContext('2d');
-
-            let dt = 'square', cs = 'square', cd = 'square';
-            if (shapeStyle === 'rounded') { dt = 'rounded'; cs = 'extra-rounded'; cd = 'dot'; }
-            else if (shapeStyle === 'dots') { dt = 'dots'; cs = 'extra-rounded'; cd = 'dot'; }
-
-            qrCodeStyling.update({
-                data: url,
-                dotsOptions: { color: fgColor, type: dt },
-                backgroundOptions: { color: "#ffffff" },
-                cornersSquareOptions: { color: fgColor, type: cs },
-                cornersDotOptions: { color: fgColor, type: cd }
-            });
-
-            const textBlockHeight = (position === 'middle' || !title) ? 0 : (titleSize + titleMargin);
-            finalCanvas.width = QR_SIZE + pLeft + pRight;
-            finalCanvas.height = QR_SIZE + pTop + pBottom + textBlockHeight;
-            document.getElementById('canvas-dim').innerText = `${finalCanvas.width} x ${finalCanvas.height} px`;
-
-            const qrBlob = await qrCodeStyling.getRawData('png');
-            const qrImg = new Image();
-            qrImg.src = URL.createObjectURL(qrBlob);
-
-            qrImg.onload = () => {
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-
-                let qrX = pLeft;
-                let qrY = (position === 'top' && title) ? (pTop + textBlockHeight) : pTop;
-                ctx.drawImage(qrImg, qrX, qrY, QR_SIZE, QR_SIZE);
-
-                if (title) {
-                    ctx.fillStyle = textColor;
-                    ctx.font = `bold ${titleSize}px 'Microsoft JhengHei', Arial`;
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-
-                    let tx = finalCanvas.width / 2;
-                    let ty;
-                    if (position === 'top') {
-                        ty = pTop + (titleSize / 2);
-                    } else if (position === 'bottom') {
-                        ty = finalCanvas.height - pBottom - (titleSize / 2);
-                    } else { // middle
-                        ty = pTop + (QR_SIZE / 2);
-                        const textWidth = ctx.measureText(title).width + 20;
-                        ctx.fillStyle = "#ffffff";
-                        ctx.fillRect(tx - textWidth / 2, ty - titleSize / 2 - 5, textWidth, titleSize + 10);
-                        ctx.fillStyle = textColor;
-                    }
-                    ctx.fillText(title, tx, ty);
-                }
-                URL.revokeObjectURL(qrImg.src);
-            };
-        }
-
-        function downloadQR() {
-            const canvas = document.getElementById('final-canvas');
-            const link = document.createElement('a');
-            link.download = `SJPS-QR-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-    </script>
+    window.onload = generateQR;
+</script>
 </body>
 </html>
